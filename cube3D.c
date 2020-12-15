@@ -1,36 +1,57 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cube3D.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/12/15 15:14:38 by scolen            #+#    #+#             */
+/*   Updated: 2020/12/15 18:15:01 by scolen           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minilibx_mms/mlx.h"
 #include "get_next_line/get_next_line.h"
 #include "libft/libft.h"
+#include "cube3D.h"
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-typedef	struct	s_min_max_value
+void	standart_value_struct(t_value_from_map *value_map)
 {
-	int x_min;
-	int x_max;
-	int y_min;
-	int y_max;
-}				t_min_max_value;
+	value_map->resolution_x = -1;
+	value_map->resolution_y = -1;
 
-t_list	*add_map(t_list **map)
+	value_map->north_texture = NULL;
+	value_map->south_texture = NULL;
+	value_map->west_texture = NULL;
+	value_map->east_texture = NULL;
+	value_map->sprite_texture = NULL;
+
+	value_map->floor_color_r = -1;
+	value_map->floor_color_g = -1;
+	value_map->floor_color_b = -1;
+
+	value_map->ceilling_color_r = -1;
+	value_map->ceilling_color_g = -1;
+	value_map->ceilling_color_b = -1;
+}
+
+int main()
 {
-	char *line;
-	int fd;
-
-	fd = open("map.cub", O_RDONLY);
-	while (get_next_line(fd, &line) == 1)
-	{
-		ft_lstadd_back(map, ft_lstnew(line));
-		// free(line);
-	}
-	return (&(**map));
+	int fd = open("map.cub", O_RDONLY);
+	t_value_from_map *value_map;
+	value_map = malloc(sizeof(t_value_from_map) * 1);
+	standart_value_struct(value_map);
+	get_value_resolution(fd, value_map);
+	return (0);
 }
 
 // int main()
 // {
-// 	// int x = 30;
-// 	// int y = 30;
+// 	int x = 30;
+// 	int y = 30;
 // 	void *mlx = NULL;
 // 	void *window = NULL;
 // 	int len_strng;
@@ -44,7 +65,7 @@ t_list	*add_map(t_list **map)
 // 	start = 0;
 // 	min_max_value.x_min = 30;
 // 	start_string = 0;
-// 	list_map = add_map(&list_map);
+// 	list_map = add_map(list_map);
 // 	// while (list_map)
 // 	// {
 // 	// 	printf("%s\n", list_map->content);
