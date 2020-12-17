@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:14:38 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/15 18:15:01 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/16 20:45:23 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int main()
 	t_value_from_map *value_map;
 	value_map = malloc(sizeof(t_value_from_map) * 1);
 	standart_value_struct(value_map);
-	get_value_resolution(fd, value_map);
+	manage_function(fd, value_map);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/15 18:14:04 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/16 20:41:23 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,4 +45,4 @@ typedef	struct	s_value_from_map
 	int			ceilling_color_b;
 }				t_value_from_map;
 
-void	get_value_resolution(int fd, t_value_from_map *value_from_map);
+void	manage_function(int fd, t_value_from_map *value_map);
