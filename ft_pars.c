@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 13:15:09 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/17 21:46:16 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/18 22:15:40 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ int	ft_strcmp(const char *str1, const char *str2)
 	return (0);
 }
 
-#pragma region path_prite
+#pragma region path_sprite
+
 void	get_path_sprite(char *line, t_value_from_map *value_map)
 {
 	char *substr;
@@ -133,16 +134,87 @@ void	get_path_north(char *line, t_value_from_map *value_map)
 }
 #pragma endregion
 
+int		pass_space(char *substr)
+{
+	int start;
+
+	start = 0;
+	while (substr[start] == ' ' || substr[start] == '\t')
+		start++;
+	return (start);
+}
+
+int	cont_get_val_color_fl(char *substr, t_value_from_map *value_map,
+	int quantity_number, int start)
+{
+	int number;
+	int new_start;
+	int count_comma;
+
+	number = -1;
+	new_start = 0;
+	count_comma = 0;
+	number = ft_atoi(&substr[new_start]);
+	if (quantity_number == 0)
+		value_map->floor_color_r = number;
+	else if (quantity_number == 1)
+		value_map->floor_color_g = number;
+	else if (quantity_number == 2)
+		value_map->floor_color_b = number;
+	new_start = new_start + len_number(number) - 1;
+	new_start = new_start + pass_space(&substr[new_start]);
+	while (substr[new_start] == ',')
+	{
+		new_start++;
+		count_comma++;
+	}
+	if (count_comma > 1/* || (substr[new_start - 1] >= 1 &&
+		substr[new_start - 1] <= 127 && quantity_number == 2)*/)
+		value_map->floor_color_r = -1;
+	return (new_start + start);
+}
+
+void	continue_get_val_color_floor(char *substr, t_value_from_map *value_map)
+{
+	int start;
+	int quantity_number;
+	int quantity_comma;
+
+	start = 0;
+	quantity_comma = 0;
+	quantity_number = 0;
+	while (substr[start])
+	{
+		while (substr[start] == '0')
+			start++;
+		start = start + pass_space(&substr[start]);
+		start = cont_get_val_color_fl(&substr[start],
+			value_map, quantity_number, start);
+		// if (quantity_number == 2 /*&& substr[start + 1] >= 1 && substr[start + 1] <= 127*/)
+		// {
+		// 	// printf("str = %s", &substr[start - 1]);
+		// 	value_map->floor_color_r = -1;
+		// }
+		if (substr[start] == ',' && quantity_number < 3)
+			start++;
+		else if ((substr[start] != ',' && quantity_number > 2))
+		{
+			value_map->floor_color_r = -1;
+			break ;
+		}
+		quantity_number++;
+	}
+}
+
 void	get_value_color_floor(char *line, t_value_from_map *value_map)
 {
 	char *substr;
 	int start;
 	int length_number;
-	(void)value_map;
 	int number;
 
 	substr = ft_strnstr(line, "F", ft_strlen(line));
-	start  = 0;
+	start = 0;
 	length_number = 0;
 	number = 0;
 	if (NULL != substr && ft_strncmp(substr, "F", 2))
@@ -150,8 +222,7 @@ void	get_value_color_floor(char *line, t_value_from_map *value_map)
 		start++;
 		while (substr[start] == ' ' && substr[start])
 			start++;
-
-		// printf("\nFloor: %s\n", &substr[start]);
+		continue_get_val_color_floor(&substr[start], value_map);
 	}
 }
 
@@ -202,4 +273,7 @@ void	manage_function(int fd, t_value_from_map *value_map)
 	printf("West = %s\n", value_map->west_texture);
 	printf("East = %s\n", value_map->east_texture);
 	printf("Sprite = %s\n", value_map->sprite_texture);
+	printf("Floor_r = %d\n", value_map->floor_color_r);
+	printf("Floor_g = %d\n", value_map->floor_color_g);
+	printf("Floor_b = %d\n", value_map->floor_color_b);
 }
