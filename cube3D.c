@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:14:38 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/16 20:45:23 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/19 22:03:19 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,20 @@ int main()
 	value_map = malloc(sizeof(t_value_from_map) * 1);
 	standart_value_struct(value_map);
 	manage_function(fd, value_map);
+
+	printf("Resolution: x = %d, y = %d\n", value_map->resolution_x, value_map->resolution_y);
+	printf("North = %s\n", value_map->north_texture);
+	printf("South = %s\n", value_map->south_texture);
+	printf("West = %s\n", value_map->west_texture);
+	printf("East = %s\n", value_map->east_texture);
+	printf("Sprite = %s\n", value_map->sprite_texture);
+	printf("Color_r = %d\n", value_map->ceilling_color_r);
+	printf("Color_g = %d\n", value_map->ceilling_color_g);
+	printf("Color_b = %d\n", value_map->ceilling_color_b);
+	printf("Floor_r = %d\n", value_map->floor_color_r);
+	printf("Floor_g = %d\n", value_map->floor_color_g);
+	printf("Floor_b = %d\n", value_map->floor_color_b);
+	close(fd);
 	return (0);
 }
 
