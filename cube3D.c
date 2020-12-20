@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:14:38 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/19 22:03:19 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/20 19:56:07 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,34 +18,17 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-void	standart_value_struct(t_value_from_map *value_map)
-{
-	value_map->resolution_x = -1;
-	value_map->resolution_y = -1;
-
-	value_map->north_texture = NULL;
-	value_map->south_texture = NULL;
-	value_map->west_texture = NULL;
-	value_map->east_texture = NULL;
-	value_map->sprite_texture = NULL;
-
-	value_map->floor_color_r = -1;
-	value_map->floor_color_g = -1;
-	value_map->floor_color_b = -1;
-
-	value_map->ceilling_color_r = -1;
-	value_map->ceilling_color_g = -1;
-	value_map->ceilling_color_b = -1;
-}
-
 int main()
 {
 	int fd = open("map.cub", O_RDONLY);
+	char **map;
 	t_value_from_map *value_map;
+
 	value_map = malloc(sizeof(t_value_from_map) * 1);
 	standart_value_struct(value_map);
-	manage_function(fd, value_map);
+	map = manage_function(fd, value_map);
 
+	paint_map(map, value_map);
 	printf("Resolution: x = %d, y = %d\n", value_map->resolution_x, value_map->resolution_y);
 	printf("North = %s\n", value_map->north_texture);
 	printf("South = %s\n", value_map->south_texture);

@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/16 20:41:23 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/20 19:48:45 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,4 +45,27 @@ typedef	struct	s_value_from_map
 	int			ceilling_color_b;
 }				t_value_from_map;
 
-void	manage_function(int fd, t_value_from_map *value_map);
+typedef struct  s_data {
+    void        *img;
+    char        *addr;
+    int         bits_per_pixel;
+    int         line_length;
+    int			endian;
+}               t_data;
+
+int			len_number(int number);
+int			ft_strcmp(const char *str1, const char *str2);
+int			pass_space(char *substr);
+int			count_comma(char *substr);
+void		get_value_resolution(char *line, t_value_from_map *value_map);
+void		get_path_sprite(char *line, t_value_from_map *value_map);
+void		get_path_east(char *line, t_value_from_map *value_map);
+void		get_path_north(char *line, t_value_from_map *value_map);
+void		get_path_south(char *line, t_value_from_map *value_map);
+void		get_path_west(char *line, t_value_from_map *value_map);
+void		get_value_color(char *line, t_value_from_map *value_map);
+void		get_value_color_floor(char *line, t_value_from_map *value_map);
+void		standart_value_struct(t_value_from_map *value_map);
+int			value_from_maps_not_null(t_value_from_map *value_map);
+void		paint_map(char **map, t_value_from_map *value_map);
+char		**manage_function(int fd, t_value_from_map *value_map);
