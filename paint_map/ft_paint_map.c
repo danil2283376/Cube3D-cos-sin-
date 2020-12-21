@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 19:19:50 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/20 23:42:03 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/21 13:34:30 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,6 @@
 #include "../get_next_line/get_next_line.h"
 #include "../libft/libft.h"
 #include "../cube3D.h"
-
-typedef struct  s_window {
-    void        *mlx;
-    void        *win;
-}               t_window;
 
 int				key_hook(int keycode, t_window *window)
 {
@@ -30,19 +25,60 @@ int				key_hook(int keycode, t_window *window)
 	return (1);
 }
 
-void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
+void            my_mlx_pixel_put(t_info_image *img, int x, int y, int color)
 {
     char    *dst;
 
-    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+    dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
     *(unsigned int*)dst = color;
 }
 
-void	filling_struct(t_data *img, void *mlx, int x, int y)
+
+//					данные о картинке цвет заполняемой картинки, и ширина и высота картинки
+void	filling_image(t_info_image *img, int color, int x, int y)
 {
-	img->img = mlx_new_image(mlx, x, y);
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	img->x = x;
+	img->y = y;
+	img->img = mlx_new_image(img->mlx, img->x, img->y);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
 		&img->line_length, &img->endian);
+	while (i < img->x)
+	{
+		while (j < img->y)
+		{
+			my_mlx_pixel_put(img, i, j, color);
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+}
+
+void	rebuilding_map(char **map, t_window *window, t_object_on_scene *objects)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	while (map[i])
+	{
+		while (map[i][j])
+		{
+			if (map[i][j] == '1')
+				mlx_put_image_to_window(window->mlx, window->win, objects->wall.img, j * objects->wall.x, i * objects->player.y);
+			if (map[i][j] == 'N')
+				mlx_put_image_to_window(window->mlx, window->win, objects->player.img, j * objects->player.x, i * objects->player.x);
+			j++;
+		}
+		j = 0;
+		i++;
+	}
 }
 
 void	paint_map(char **map, t_value_from_map *value_map)
@@ -52,65 +88,26 @@ void	paint_map(char **map, t_value_from_map *value_map)
 	int x;
 	int y;
 
-	t_data img_wall;
-	t_data img_player;
+	t_info_image img_wall;
+	t_info_image img_player;
+	t_object_on_scene objects;
 	t_window window;
 	(void)map;
 
 	i = 0;
 	j = 0;
-	x = 60;
-	y = 60;
+	x = 40;
+	y = 40;
 	window.mlx = mlx_init();
 	window.win = mlx_new_window(window.mlx, value_map->resolution_x, value_map->resolution_y, "Cube3D");
-	filling_struct(&img_wall, window.mlx, x, y);
-	filling_struct(&img_player, window.mlx, x, y);
-	// img_wall.img = mlx_new_image(mlx, x, y);
-	// img_wall.addr = mlx_get_data_addr(img_wall.img, &img_wall.bits_per_pixel,
-	// 	&img_wall.line_length, &img_wall.endian);
-	while (i < x)
-	{
-		while (j < y)
-		{
-			my_mlx_pixel_put(&img_wall, i, j, 0xFFFFFF);
-			my_mlx_pixel_put(&img_player, i, j, 0xff0000);
-			j++;
-		}
-		j = 0;
-		i++;
-	}
-	i = 0;
-	j = 0;
-	// mlx_put_image_to_window(mlx, win, img.img, 10, 10);
-	while (map[i])
-	{
-		while (map[i][j])
-		{
-			// if (map[i][j] == ' ' || map[i][j] == '\t')
-			// 	x = x + 10;
-			// if (map[i][j] == 'N')
-			// 	x = x + 10;
-			// if (map[i][j] == '2')
-			// 	x = x + 10;
-			if (map[i][j] == '1')
-			{
-				mlx_put_image_to_window(window.mlx, window.win, img_wall.img, j * x, i * y);
-				// x = x + 10;
-			}
-			if (map[i][j] == 'N')
-			{
-				mlx_put_image_to_window(window.mlx, window.win, img_player.img, j * x, i * y);
-			}
-			// if (map[i][j] == '0')
-			// 	x = x + 10;
-			j++;
-		}
-		// x = 10;
-		// y = y + 10;
-		j = 0;
-		i++;
-	}
+	img_wall.mlx = window.mlx;
+	img_player.mlx = window.mlx;
+	filling_image(&img_wall, value_map->ceilling_color_r, x, y);
+	filling_image(&img_player, value_map->ceilling_color_g, x, y);
+	objects.player = img_player;
+	objects.wall = img_wall;
+	rebuilding_map(map, &window, &objects);
 	mlx_key_hook(window.win, key_hook, &window);
-	mlx_loop_hook(window->mlx, ,); /// САМА ЗАНИМАЕТСЯ ПЕРЕРИСОВКОЙ!!!!!!
+	// mlx_loop_hook(window->mlx, ,); /// САМА В бесконечном цикле будет вызывать нашу функцию!!!!!!
 	mlx_loop(window.mlx);
 }

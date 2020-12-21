@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/20 19:48:45 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/21 13:34:44 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,33 @@ typedef	struct	s_value_from_map
 	int			ceilling_color_b;
 }				t_value_from_map;
 
-typedef struct  s_data {
+typedef struct  s_info_image {
+	void		*mlx;
     void        *img;
     char        *addr;
     int         bits_per_pixel;
     int         line_length;
     int			endian;
-}               t_data;
+	int			x;
+	int			y;
+}               t_info_image;
+
+typedef struct  s_window {
+    void        *mlx;
+    void        *win;
+}               t_window;
+
+typedef struct s_object_on_scene
+{
+	t_info_image player;
+	t_info_image wall;
+	t_info_image prize;
+	void		*mlx;
+	void        *win;
+
+}				t_object_on_scene;
+
+
 
 int			len_number(int number);
 int			ft_strcmp(const char *str1, const char *str2);
