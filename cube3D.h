@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/21 20:57:54 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/22 20:00:09 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ typedef struct  s_info_image {
     int         bits_per_pixel;
     int         line_length;
     int			endian;
-	int			x;
-	int			y;
+	int			width_x;
+	int			height_y;
 	int			color;
 }               t_info_image;
 
@@ -65,13 +65,17 @@ typedef struct  s_window {
 typedef struct s_object_on_scene
 {
 	t_info_image player;
+	int			player_x;
+	int			player_y;
+	int			plyer_dir;
+	int			start;
+	int			end;
+
 	t_info_image floor;
 	t_info_image wall;
 	t_info_image prize;
 	t_info_image ray;
 	char		**map;
-	int			player_x;
-	int			player_y;
 	void		*mlx;
 	void        *win;
 
