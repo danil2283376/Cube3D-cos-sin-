@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/22 20:00:09 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/27 15:01:29 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
-
-typedef	struct	s_min_max_value
-{
-	int x_min;
-	int x_max;
-	int y_min;
-	int y_max;
-}				t_min_max_value;
 
 typedef	struct	s_value_from_map
 {
@@ -45,7 +37,8 @@ typedef	struct	s_value_from_map
 	int			ceilling_color_b;
 }				t_value_from_map;
 
-typedef struct  s_info_image {
+typedef struct  s_info_image
+{
 	void		*mlx;
     void        *img;
     char        *addr;
@@ -57,31 +50,30 @@ typedef struct  s_info_image {
 	int			color;
 }               t_info_image;
 
-typedef struct  s_window {
-    void        *mlx;
-    void        *win;
-}               t_window;
-
 typedef struct s_object_on_scene
 {
-	t_info_image player;
-	int			player_x;
-	int			player_y;
-	int			plyer_dir;
-	int			start;
-	int			end;
+	t_info_image	player;
+	float			player_position_x;
+	float			player_position_y;
+	float			player_direction_x;
+	float			player_direction_y;
+	float			player_angle;
+	// float			player_angle_right;
+	int				speed;
 
 	t_info_image floor;
 	t_info_image wall;
 	t_info_image prize;
 	t_info_image ray;
+	float		position_ray_x;
+	float		position_ray_y;
+	float		min_angle;
+	float		max_angle;
 	char		**map;
 	void		*mlx;
 	void        *win;
 
 }				t_object_on_scene;
-
-
 
 int			len_number(int number);
 int			ft_strcmp(const char *str1, const char *str2);

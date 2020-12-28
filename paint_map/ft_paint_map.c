@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 19:19:50 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/22 20:16:50 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/27 20:23:21 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,97 +16,165 @@
 #include "../cube3D.h"
 #include <math.h>
 
-#pragma region movent_player
-void				move_left(t_object_on_scene *obj)
+void	raycast(t_object_on_scene *objects)
 {
-	if (obj->map[obj->player_y][obj->player_x - 1] != '1')
+	float	save_x;
+	float	save_y;
+	t_object_on_scene ray = *objects;
+	ray.player_position_x += (objects->player_direction_x);
+	ray.player_position_y += (objects->player_direction_y);
+	save_x = ray.player_position_x;
+	save_y = ray.player_position_y;
+	// printf("dir_x: %f, dir_y: %f\n", objects->player_direction_x, objects->player_direction_y);
+	ray.min_angle = ray.player_angle - 45;
+	ray.max_angle = ray.player_angle + 45;
+	while (ray.min_angle < ray.max_angle)
 	{
-		int i;
-		int j;
-		int new_pos;
-
-		i = obj->player_y - 1;
-		j = obj->player_x;
-		new_pos = obj->player.height_y;
-		printf("new_pos: %d\n", new_pos);
-		while ('1' != obj->map[i][j])
+		ray.player_position_x = save_x;
+		ray.player_position_y = save_y;
+		while (objects->map[(int)ray.player_position_y][(int)(ray.player_position_x)] != '1')
 		{
-			write(1, "2", 1);
-			printf("pos_ray: x = %d, y = %d\n", j, i);
-			mlx_put_image_to_window(obj->mlx, obj->win, obj->floor.img, (obj->player_x * obj->player.width_x), ((obj->player_y) * (obj->player.height_y) - new_pos));
-			new_pos = new_pos + (obj->player.height_y);
-			i--;
+			// printf("player{x:%f, y:%f} \t\t ray{x:%f, y:%f}\n",
+			// objects->player_position_x, objects->player_position_y, ray.player_position_x, ray.player_position_y);
+			//позиция игрока		старая позиция игрока +
+			ray.player_position_x = ray.player_position_x + cos(ray.min_angle * (M_PI / 180.0));
+			ray.player_position_y = (ray.player_position_y + ((sin(ray.min_angle * (M_PI / 180.0)) * (-1))));
+			mlx_put_image_to_window(ray.mlx, ray.win, ray.ray.img,
+			((objects->player.width_x * ray.player_position_x) + (objects->player.width_x / 2)),
+			((objects->player.height_y * ray.player_position_y)) + 35);
+			// i++;
 		}
-		obj->map[obj->player_y][obj->player_x] = '0';
-		printf("pos: x = %d, y = %d\n", j, i);
-		mlx_put_image_to_window(obj->mlx, obj->win, obj->floor.img, (obj->player_x * obj->player.width_x), obj->player_y * obj->player.height_y);
-		// mlx_put_image_to_window(obj->mlx, obj->win, obj->floor.img, obj->player_y * obj->player.x, obj->player_x * obj->player.y);
-		obj->map[obj->player_y][obj->player_x - 1] = 'N';
+		ray.min_angle = ray.min_angle + 2.0;
+		// ray.min_angle += ray.min_angle / 5;
+		// ray.player_position_x = objects->player_position_x;
+		// ray.player_position_y = objects->player_position_y;
 	}
+	// objects->position_ray_x = ray.player_position_x;
+	// objects->position_ray_y = ray.player_position_y;
+	// while (objects->map[(int)(ray.player_y / ray.player.width_x)][(int)(ray.player_x / ray.player.width_x)] != '1' && i < 5)
+	// {
+	// printf("player_angle: %f\n", objects->player_angle);
+
+	// while (i < 5)
+	// {
+	// 	ray.player_position_x = ray.player_position_x + (cos(ray.player_angle * (M_PI / 180.0)));
+	// 	ray.player_position_y = ray.player_position_y + (sin(ray.player_angle * (M_PI / 180.0)));
+	// 	printf("player_pos_x: %f, player_pos_y: %f\n", ray.player_position_x, ray.player_position_y);
+	// 	ray.player_position_y *= (-1);
+	// 	mlx_put_image_to_window(ray.mlx, ray.win, ray.ray.img,
+	// 	(objects->player_position_x * objects->player.width_x + (objects->player.width_x / 2)) + (ray.player_position_x * objects->player.width_x),
+	// 	(objects->player_position_y * objects->player.height_y) + (ray.player_position_y * objects->player.height_y));
+	// 	i++;
+	// }
+
+
+	// ray.player_position_x = cos(ray.player_angle * (M_PI / 180.0));
+	// ray.player_position_y = sin(ray.player_angle * (M_PI / 180.0));
+	// printf("x: %f, y: %f\n", ray.player_position_x, ray.player_position_y);
+	// mlx_put_image_to_window(ray.mlx, ray.win, ray.ray.img,
+	// 	(objects->player_position_x * objects->player.width_x + (objects->player.width_x / 2 )) + (ray.player_position_x * objects->player.width_x),
+	// 	 (objects->player_position_y * objects->player.height_y) + (ray.player_position_y * objects->player.height_y));
+
+	// рабочий луч
+	// while (objects->map[i_ray][j_ray] != '1' && i_ray >= 0)
+	// {
+	// 	mlx_put_image_to_window(objects->mlx, objects->win, objects->ray.img, (j_ray * objects->ray.width_x) + (objects->player.width_x / 2), i_ray * objects->ray.height_y);
+	// 	i_ray--;
+	// }
 }
 
-void			move_right(t_object_on_scene *obj)
+int	rebuilding_map(t_object_on_scene *objects)
 {
-	int i;
-	int j;
-	int new_pos;
-
-	i = obj->player_y - 1;
-	j = obj->player_x;
-	new_pos = obj->player.height_y;;
-	if (obj->map[obj->player_y][obj->player_x + 1] != '1')
+	float i;
+	float j;
+	static int boolean = 0;
+	(void)objects;
+	i = 0.0;
+	j = 0.0;
+	mlx_clear_window(objects->mlx, objects->win);
+	while (objects->map[(int)i])
 	{
-		obj->map[obj->player_y][obj->player_x] = '0';
-		mlx_put_image_to_window(obj->mlx, obj->win, obj->floor.img, (obj->player_x * obj->player.width_x), obj->player_y * obj->player.height_y);
-		while ('1' != obj->map[i][j])
+		while (objects->map[(int)i][(int)j])
 		{
-			write(1, "2", 1);
-			printf("pos_ray: x = %d, y = %d\n", j, i);
-			mlx_put_image_to_window(obj->mlx, obj->win, obj->floor.img, (obj->player_x * obj->player.width_x), ((obj->player_y) * (obj->player.height_y) - new_pos));
-			new_pos = new_pos + (obj->player.height_y);
-			i--;
+			if (objects->map[(int)i][(int)j] == '1')
+				mlx_put_image_to_window(objects->mlx, objects->win, objects->wall.img, j * objects->wall.width_x, i * objects->player.height_y);
+			if (objects->map[(int)i][(int)j] == 'N')
+			{
+				objects->player_position_x = j;
+				objects->player_position_y = i;
+				if (boolean == 0)
+				{
+					objects->position_ray_x = objects->player_position_x;
+					objects->position_ray_y = objects->player_position_y;
+				}
+				// if (objects->map[(int)objects->position_ray_y][(int)objects->position_ray_y] != '1')
+				// {
+				// printf("{x: %d, y: %d}\n", (int)objects->position_ray_x, (int)objects->position_ray_y);
+				// }
+				raycast(objects);
+			}
+			if (objects->map[(int)i][(int)j] == '0' && boolean == 0)
+				mlx_put_image_to_window(objects->mlx, objects->win, objects->floor.img, j * objects->floor.width_x, i * objects->floor.height_y);
+			j++;
 		}
-		obj->map[obj->player_y][obj->player_x + 1] = 'N';
+		j = 0;
+		i++;
 	}
+
+	boolean = 1;
+	return (0);
 }
 
-void			move_top(t_object_on_scene *obj)
+void			move(t_object_on_scene *obj)
 {
-	if (obj->map[obj->player_y - 1][obj->player_x] != '1')
-	{
-		obj->map[obj->player_y][obj->player_x] = '0';
-		mlx_put_image_to_window(obj->mlx, obj->win, obj->floor.img, (obj->player_x * obj->player.width_x), obj->player_y * obj->player.height_y);
-		obj->map[obj->player_y - 1][obj->player_x] = 'N';
-	}
+	printf("x: %f, y: %f\n", obj->player_direction_x, obj->player_direction_y);
+	mlx_put_image_to_window(obj->mlx, obj->win, obj->player.img,
+	(obj->player_position_x * obj->player.width_x) + (obj->player_direction_x * (obj->speed * 2)), // по x
+	obj->player_position_y * obj->player.height_y + (obj->player_direction_y * (obj->speed * 2))); // по y
 }
-
-void			move_down(t_object_on_scene *obj)
-{
-	if (obj->map[obj->player_y + 1][obj->player_x] != '1')
-	{
-		obj->map[obj->player_y][obj->player_x] = '0';
-		mlx_put_image_to_window(obj->mlx, obj->win, obj->floor.img, (obj->player_x * obj->player.width_x), obj->player_y * obj->player.height_y);
-		obj->map[obj->player_y + 1][obj->player_x] = 'N';
-	}
-}
-#pragma endregion
 
 int				key_hook(int keycode, t_object_on_scene *obj)
 {
-	printf("keycode: %d\n", keycode);
+	// if ((int)obj->player_angle > 360 || (int)obj->player_angle < -360)
+	// 	obj->player_angle = 0;
+	// if ((int)obj->player_angle_right >)
+	// printf("keycode: %d\n", keycode);
 	if (keycode == 53)
 		exit(1);
-	if (/*keycode == 123 ||*/ keycode == 0) // лево
-		move_left(obj);
+		// поворот градусов
+	if (keycode == 123)
+		obj->player_angle = obj->player_angle + 20.0;
+	if (keycode == 124)
+		obj->player_angle = obj->player_angle - 20.0;
+	float move_x = (cos(obj->player_angle * (M_PI / 180.0))) * (-1);
+	float move_y = (sin(obj->player_angle * (M_PI / 180.0))) * (-1);
+	// if (/*keycode == 123 ||*/ keycode == 0) // лево
+	// {
+	// 	obj->player_direction_x -= move_x;
+	// }
 	if (/*keycode == 124 || */keycode == 2) // вправо
-		move_right(obj);
+	{
+		obj->player_direction_x += cos(0);
+		obj->player_direction_y += sin(0); // доделать в право и в лево
+	}
 	if (/*keycode == 126 || */keycode == 13) // вверх
-		move_top(obj);
+	{
+		obj->player_direction_x -= move_x;
+		obj->player_direction_y += move_y;
+	}
 	if (/* keycode == 125 || */keycode == 1) // вниз
-		move_down(obj);
-
-	(void)obj;
+	{
+		obj->player_direction_x += move_x;
+		obj->player_direction_y -= move_y;
+	}
 	// printf("Hello from key_hook\n");
+	// move(obj);
+	printf("до move: x: %f, y: %f\n", move_x, move_y);
+	rebuilding_map(obj);
+	mlx_put_image_to_window(obj->mlx, obj->win, obj->player.img,
+	(obj->player_position_x * obj->player.width_x) + (obj->player_direction_x * (obj->speed * 2)), // по x
+	obj->player_position_y * obj->player.height_y + (obj->player_direction_y * (obj->speed * 2))); // по y
+	// move(obj);
 	return (1);
 }
 
@@ -116,30 +184,6 @@ void            my_mlx_pixel_put(t_info_image *img, int x, int y, int color)
 
     dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
     *(unsigned int *)dst = color;
-}
-
-void	filling_image_ray(t_info_image *img, int color, int x, int y)
-{
-	int i;
-	int j;
-
-	i = 0;
-	j = 0;
-	img->width_x = x;
-	img->height_y = y;
-	img->img = mlx_new_image(img->mlx, 1/*img->width_x*/, img->height_y);
-	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
-		&img->line_length, &img->endian);
-	while (i < 5)
-	{
-		while (j < y)
-		{
-			my_mlx_pixel_put(img, i, j, color);
-			j++;
-		}
-		// i = 19;
-		i++;
-	}
 }
 
 //					данные о картинке цвет заполняемой картинки, и ширина и высота картинки
@@ -167,165 +211,46 @@ void	filling_image(t_info_image *img, int color, int x, int y)
 	}
 }
 
-void	raycast(t_object_on_scene *objects, int i_ray, int j_ray)
+void	settings_objects(t_object_on_scene *objects)
 {
-	// objects->start = objects->player_dir - M_PI_4;
-	// objects->end = objects->player_dir + M_PI_4;
-	// while (objects->start < objects->end)
-	// {
-	// 	while (objects->map[(int)(objects->player_y / SCALE)][])
-	// 	{
-
-	// 	}
-	// }
-	while (objects->map[i_ray][j_ray] != '1' && i_ray >= 0)
-	{
-		// write(1, "1", 1);
-		mlx_put_image_to_window(objects->mlx, objects->win, objects->ray.img, (j_ray * objects->ray.width_x) + (objects->player.width_x / 2), i_ray * objects->ray.height_y);
-		i_ray--;
-	}
+	objects->floor.mlx = objects->mlx;
+	objects->wall.mlx = objects->mlx;
+	objects->prize.mlx = objects->mlx;
+	objects->ray.mlx = objects->mlx;
+	objects->player.mlx = objects->mlx;
 }
 
-int	rebuilding_map(/*char **map, t_window *window, */t_object_on_scene *objects)
+void	set_settings_player(t_object_on_scene *objects)
 {
-	int i;
-	int j;
-	int i_ray;
-	int j_ray;
-	static int boolean = 0;
-
-	i = 0;
-	j = 0;
-	while (objects->map[i])
-	{
-		while (objects->map[i][j])
-		{
-			if (objects->map[i][j] == '1')
-				mlx_put_image_to_window(objects->mlx, objects->win, objects->wall.img, j * objects->wall.width_x, i * objects->player.height_y);
-			if (objects->map[i][j] == 'N')
-			{
-				objects->player_x = j; // позиция по х
-				objects->player_y = i; // позиция по y
-				i_ray = i;
-				j_ray = j;
-				raycast(objects, i_ray, j_ray);
-				// while (objects->map[i_ray][j_ray] != '1' && i_ray >= 0)
-				// {
-				// 	// write(1, "1", 1);
-				// 	mlx_put_image_to_window(objects->mlx, objects->win, objects->ray.img, j_ray * objects->ray.width_x, i_ray * objects->ray.height_y);
-				// 	i_ray--;
-				// }
-				mlx_put_image_to_window(objects->mlx, objects->win, objects->player.img, j * objects->player.width_x, i * objects->player.height_y);
-			}
-			if (objects->map[i][j] == '0' && boolean == 0)
-				mlx_put_image_to_window(objects->mlx, objects->win, objects->floor.img, j * objects->floor.width_x, i * objects->floor.height_y);
-			j++;
-		}
-		j = 0;
-		i++;
-	}
-	boolean = 1;
-	return (0);
-}
-
-int	filling_color(t_object_on_scene *obj, t_value_from_map *value_map, char obj_on_scene)
-{
-	int color_hex;
-
-	color_hex = 0;
-	if (obj_on_scene == 'N')
-	{
-		color_hex = 10 | 50 | 100;
-		obj->player.color = color_hex;
-	}
-	if (obj_on_scene == '1')
-	{
-		color_hex = 0xf3f2ff;
-		obj->wall.color = color_hex;
-	}
-	if (obj_on_scene == '0')
-	{
-		color_hex = value_map->ceilling_color_r | value_map->ceilling_color_g | value_map->ceilling_color_b;
-		obj->floor.color = color_hex;
-	}
-	return (color_hex);
-}
-
-
-
-int	raycasting(t_object_on_scene *obj)
-{
-	int i;
-	int j;
-
-	j = obj->player_x;
-	i = obj->player_y;
-	// while (1)
-	// {
-		printf("player_position x= %d, y= %d\n", j, i);
-		write(1, "1", 1);
-		// while (obj->map[i])
-		// {
-		// 	while (obj->map[i][j] != '1')
-		// 	{
-		// 		mlx_put_image_to_window(obj->mlx, obj->win, obj->player.img, j * obj->player.x, i * obj->player.y);
-		// 	}
-		// }
-		// while ('1' != obj->map[y][x])
-		// {
-			// write(1, "1", 1);
-			// mlx_put_image_to_window(obj->mlx, obj->win, obj->ray.img, x * obj->player.x, y * obj->player.y);
-			// y = y - 1;
-			// y = y + (obj->player_y);
-		// }
-		// y = (obj->player_y);
-	// }
-	return (1);
+	objects->player_angle = 90;
+	objects->player_direction_x = 0.0;
+	objects->player_direction_y = 0.0;
+	objects->player_position_x = 0.0;
+	objects->player_position_y = 0.0;
+	objects->speed = 20;
 }
 
 void	paint_map(char **map, t_value_from_map *value_map)
 {
 	int x;
 	int y;
-
-	t_info_image img_wall;
-	t_info_image img_player;
-	t_info_image img_floor;
-	t_info_image img_ray;
 	t_object_on_scene objects;
-	t_window window;
 
-	x = 70;
-	y = 70;
-	window.mlx = mlx_init();
-	window.win = mlx_new_window(window.mlx, value_map->resolution_x, value_map->resolution_y, "Cube3D");
-	img_wall.mlx = window.mlx;
-	img_player.mlx = window.mlx;
-	img_floor.mlx = window.mlx;
-	img_ray.mlx = window.mlx;
-	filling_image(&img_wall, filling_color(&objects, value_map, '1'), x, y);
-	filling_image(&img_player, filling_color(&objects, value_map, 'N'), x, y);
-	filling_image(&img_floor, /*filling_color(&objects, value_map, '0')*/0x808080, x, y);
-	filling_image_ray(&img_ray, 0xff0000, x, y);
-	objects.player = img_player;
-	objects.plyer_dir = 90;
-	objects.wall = img_wall;
-	objects.floor = img_floor;
-	objects.ray = img_ray;
+	x = 40;
+	y = 40;
+	objects.mlx = mlx_init();
+	objects.win = mlx_new_window(objects.mlx, value_map->resolution_x, value_map->resolution_y, "Cube3D");
 	objects.map = map;
-	objects.mlx = window.mlx;
-	objects.win = window.win;
-	// rebuilding_map(/*map, &window, */&objects);
-	// mlx_key_hook(window.win, key_hook, &objects);
-	// mlx_expose_hook(,);
-	write(1, "1", 1);
-	rebuilding_map(/*char **map, t_window *window, */&objects);
-	mlx_hook(window.win, 2, 1L << 0, key_hook, &objects);
-	mlx_loop_hook(window.mlx, rebuilding_map, &objects);
-	// mlx_loop_hook(window.mlx, raycasting, &objects);
-	// mlx_loop_hook(window.mlx, key_hook, &objects);
-	// mlx_loop_hook(window.mlx, mlx_key_hook(window.mlx, key_hook, &objects)/*rebuilding_map*/, &objects);
-	// mlx_mouse_hook(window.win, key_hook, &window);
+	settings_objects(&objects);
+	set_settings_player(&objects);
+	filling_image(&objects.wall, 0xffffff, x, y);
+	filling_image(&objects.player, 0x00ff00, x, y);
+	filling_image(&objects.floor, 0x808080, x, y);
+	filling_image(&objects.ray, 0xffff00, 3, 3);
+	rebuilding_map(&objects);
+	mlx_hook(objects.win, 2, 1L << 0, key_hook, &objects);
+	// mlx_loop_hook(objects.mlx, rebuilding_map, &objects);
+	// mlx_hook(objects.win, 2, 1L << 0, rebuilding_map, &objects);
 	// mlx_loop_hook(window->mlx, ,); /// САМА В бесконечном цикле будет вызывать нашу функцию!!!!!!
-	mlx_loop(window.mlx);
+	mlx_loop(objects.mlx);
 }
