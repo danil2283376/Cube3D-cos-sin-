@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 19:19:50 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/28 11:10:52 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/29 11:16:06 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,31 +51,6 @@ void	raycast(t_object_on_scene *objects)
 		// ray.player_position_x = objects->player_position_x;
 		// ray.player_position_y = objects->player_position_y;
 	}
-	// objects->position_ray_x = ray.player_position_x;
-	// objects->position_ray_y = ray.player_position_y;
-	// while (objects->map[(int)(ray.player_y / ray.player.width_x)][(int)(ray.player_x / ray.player.width_x)] != '1' && i < 5)
-	// {
-	// printf("player_angle: %f\n", objects->player_angle);
-
-	// while (i < 5)
-	// {
-	// 	ray.player_position_x = ray.player_position_x + (cos(ray.player_angle * (M_PI / 180.0)));
-	// 	ray.player_position_y = ray.player_position_y + (sin(ray.player_angle * (M_PI / 180.0)));
-	// 	printf("player_pos_x: %f, player_pos_y: %f\n", ray.player_position_x, ray.player_position_y);
-	// 	ray.player_position_y *= (-1);
-	// 	mlx_put_image_to_window(ray.mlx, ray.win, ray.ray.img,
-	// 	(objects->player_position_x * objects->player.width_x + (objects->player.width_x / 2)) + (ray.player_position_x * objects->player.width_x),
-	// 	(objects->player_position_y * objects->player.height_y) + (ray.player_position_y * objects->player.height_y));
-	// 	i++;
-	// }
-
-
-	// ray.player_position_x = cos(ray.player_angle * (M_PI / 180.0));
-	// ray.player_position_y = sin(ray.player_angle * (M_PI / 180.0));
-	// printf("x: %f, y: %f\n", ray.player_position_x, ray.player_position_y);
-	// mlx_put_image_to_window(ray.mlx, ray.win, ray.ray.img,
-	// 	(objects->player_position_x * objects->player.width_x + (objects->player.width_x / 2 )) + (ray.player_position_x * objects->player.width_x),
-	// 	 (objects->player_position_y * objects->player.height_y) + (ray.player_position_y * objects->player.height_y));
 
 	// рабочий луч
 	// while (objects->map[i_ray][j_ray] != '1' && i_ray >= 0)
@@ -135,42 +110,85 @@ void			move(t_object_on_scene *obj)
 	obj->player_position_y * obj->player.height_y + (obj->player_direction_y * (obj->speed * 2))); // по y
 }
 
+void			not_wall(t_object_on_scene *obj)
+{
+	t_object_on_scene ray = *obj;
+	int		deg;
+	float	x;
+	float	y;
+
+	obj->top_ray = 0;
+	obj->down_ray = 0;
+	obj->left_ray = 0;
+	obj->right_ray = 0;
+	deg = 0;
+	ray.player_position_x += obj->player_direction_x;
+	ray.player_position_y += obj->player_direction_y;
+	x = ray.player_position_x;
+	y = ray.player_position_y;
+
+	while (deg < 360)
+	{
+		ray.player_position_x = x;
+		ray.player_position_y = y;
+		while (obj->map[(int)ray.player_position_y][(int)ray.player_position_x] != '1')
+		{
+			ray.player_position_x = ray.player_position_x + (cos(deg * (M_PI / 180.0)));
+			ray.player_position_y = ray.player_position_y+ (sin(deg * (M_PI / 180.0)) * -1);
+			if (deg == obj->player_angle + 90)
+				obj->left_ray++;
+			if (deg == obj->player_angle - 90)
+				obj->right_ray++;
+			if (deg == obj->player_angle)
+				obj->top_ray++;
+			if (deg == obj->player_angle + 180)
+				obj->down_ray++;
+		}
+		deg++;
+	}
+}
+
+
+
 int				key_hook(int keycode, t_object_on_scene *obj)
 {
-	float move_x = (cos(obj->player_angle * (M_PI / 180.0))) * (-1);
-	float move_y = (sin(obj->player_angle * (M_PI / 180.0))) * (-1);
 	if (keycode == 53)
 		exit(1);
+	float move_x = (cos(obj->player_angle * (M_PI / 180.0))) * (-1);
+	float move_y = (sin(obj->player_angle * (M_PI / 180.0))) * (-1);
 		// поворот градусов
 	if (keycode == 123)
 		obj->player_angle = obj->player_angle + 20.0;
 	if (keycode == 124)
 		obj->player_angle = obj->player_angle - 20.0;
-	if (/*keycode == 123 ||*/ keycode == 0) // лево
+	if (obj->player_angle > 360 || obj->player_angle < 0)
+		obj->player_angle = 0;
+	not_wall(obj);
+	if (/*keycode == 123 ||*/ keycode == 0 && obj->left_ray != 0.0) // лево
 	{
 		obj->player_direction_x += cos((obj->ray_max_angle + 45) * (M_PI / 180.0)) / 7;
 		obj->player_direction_y += sin((obj->ray_max_angle + 45) * (M_PI / 180.0)) * (-1) / 7;
 	}
-	if (/*keycode == 124 || */keycode == 2) // вправо
+	if (/*keycode == 124 || */keycode == 2 && obj->right_ray != 1.0) // вправо
 	{
 		obj->player_direction_x += cos((obj->ray_min_angle - 45) * (M_PI / 180.0)) / 7;
 		obj->player_direction_y += sin((obj->ray_min_angle - 45) * (M_PI / 180.0)) * (-1) / 7;
 		// float negative_y = move_y * (-1);
 		// float varible =
 	}
-	if (/*keycode == 126 || */keycode == 13) // вверх
+	if (/*keycode == 126 || */keycode == 13 && obj->top_ray != 0.0) // вверх
 	{
 		obj->player_direction_x -= move_x / 7;
 		obj->player_direction_y += move_y / 7;
 	}
-	if (/* keycode == 125 || */keycode == 1) // вниз
+	if (/* keycode == 125 || */keycode == 1 && obj->down_ray != 1.0) // вниз
 	{
 		obj->player_direction_x += move_x / 7;
 		obj->player_direction_y -= move_y / 7;
 	}
 	// printf("Hello from key_hook\n");
 	// move(obj);
-	printf("до move: x: %f, y: %f\n", move_x, move_y);
+	// printf("до move: x: %f, y: %f\n", move_x, move_y);
 	rebuilding_map(obj);
 	mlx_put_image_to_window(obj->mlx, obj->win, obj->player.img,
 	(obj->player_position_x * obj->player.width_x) + (obj->player_direction_x * (obj->speed * 2)), // по x

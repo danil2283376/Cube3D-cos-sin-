@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/28 09:59:48 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/28 16:53:53 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ typedef struct  s_info_image
 typedef struct s_object_on_scene
 {
 	t_info_image	player;
+	int				map_hide;
 	float			player_position_x;
 	float			player_position_y;
 	float			player_direction_x;
@@ -60,17 +61,22 @@ typedef struct s_object_on_scene
 	float			player_angle;
 	// float			player_angle_right;
 	int				speed;
+	float		min_angle;
+	float		max_angle;
 
+	t_info_image window;
 	t_info_image floor;
 	t_info_image wall;
 	t_info_image prize;
 	t_info_image ray;
+	float		top_ray;
+	float		down_ray;
+	float		left_ray;
+	float		right_ray;
 	float		position_ray_x;
 	float		position_ray_y;
 	float		ray_min_angle;
 	float		ray_max_angle;
-	float		min_angle;
-	float		max_angle;
 	char		**map;
 	void		*mlx;
 	void        *win;
