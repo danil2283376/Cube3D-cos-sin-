@@ -1,12 +1,12 @@
-R 1920 1080
+R 1600 900
 NO ./path_to_the_north_texture
 SO ./path_to_the_south_texture
 WE ./path_to_the_west_texture
 EA ./path_to_the_east_texture
 S ./path_to_the_sprite_texture
 
-C 000225, 0000030,0
-F 000220, 012, 0000245
+C 225, 30,0
+F 0, 12, 245
 
         1111111111111111111111111
         1000000000110000000000001

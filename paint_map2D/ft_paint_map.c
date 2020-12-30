@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 19:19:50 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/29 19:53:26 by scolen           ###   ########.fr       */
+/*   Updated: 2020/12/30 15:32:16 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,22 +37,14 @@ void	filling_image(t_info_image *img/*, int color*/, int x, int y)
 	img->img = mlx_new_image(img->mlx, img->width_x, img->height_y);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
 		&img->line_length, &img->endian);
-	// while (i < img->width_x)
-	// {
-	// 	while (j < img->height_y)
-	// 	{
-	// 		my_mlx_pixel_put(img, i, j, color);
-	// 		j++;
-	// 	}
-	// 	j = 0;
-	// 	i++;
-	// }
 }
 
 void	raycast(t_object_on_scene *objects)
 {
 	float	save_x;
 	float	save_y;
+	int		length_ray;
+
 	t_object_on_scene ray = *objects;
 	ray.player_position_x += (objects->player_direction_x);
 	ray.player_position_y += (objects->player_direction_y);
@@ -62,6 +54,9 @@ void	raycast(t_object_on_scene *objects)
 	ray.max_angle = ray.player_angle + 45;
 	objects->ray_min_angle = ray.min_angle;
 	objects->ray_max_angle = ray.max_angle;
+	length_ray = 0;
+	int size_x = 1920 / 2;
+	int size_y = 1080 / 2;
 	while (ray.min_angle < ray.max_angle)
 	{
 		ray.player_position_x = save_x;
@@ -74,7 +69,24 @@ void	raycast(t_object_on_scene *objects)
 
 			my_mlx_pixel_put(&objects->window, ((/*objects->player.width_x*/objects->width_bloks_x * ray.player_position_x)/* + (objects->player.width_xobjects->width_bloks_x / 2)*/),
 			((/*objects->player.height_y*/objects->height_bloks_y * ray.player_position_y))/* + 35*/, 0xffff00);
+			length_ray++;
 		}
+		int start = 0;
+		// mlx_get_screen_size(objects->mlx, &size_x, &size_y);
+		printf("x = %d, y = %d\n", size_x, size_y);
+		while (start < (length_ray * 10))
+		{
+			my_mlx_pixel_put(&objects->window, size_x/* + ray.player_direction_x*/, (size_y /*+ ray.player_direction_y*/) - start, 0xff0000);
+			start++;
+		}
+		size_x = size_x + 10;
+		printf("\nHELL\n");
+		// while (start < length_ray)
+		// {
+		// 	my_mlx_pixel_put(&objects->window, objects->width_bloks_x * objects->player_position_x + 600 + start, (objects->height_bloks_y * objects->player_position_y) + start, 0xff0000);
+		// 	start++;
+		// }
+		length_ray = 0;
 		ray.min_angle = ray.min_angle + 0.1;
 	}
 
@@ -199,9 +211,9 @@ int				key_hook(int keycode, t_object_on_scene *obj)
 	float move_y = (sin(obj->player_angle * (M_PI / 180.0))) * (-1);
 		// поворот градусов
 	if (keycode == 123)
-		obj->player_angle = obj->player_angle + 20.0;
+		obj->player_angle = obj->player_angle + 15.0;
 	if (keycode == 124)
-		obj->player_angle = obj->player_angle - 20.0;
+		obj->player_angle = obj->player_angle - 15.0;
 	if (/*keycode == 123 ||*/ keycode == 0/* && obj->left_ray != 0.0*/) // лево
 	{
 		obj->player_direction_x += cos((obj->ray_max_angle + 45) * (M_PI / 180.0)) / 7;
@@ -226,8 +238,8 @@ int				key_hook(int keycode, t_object_on_scene *obj)
 	}
 	rebuilding_map(obj);
 	my_mlx_pixel_put(&obj->window,
-	(obj->player_position_x * obj->width_bloks_x) + (obj->player_direction_x * (obj->speed * 2)),
-	obj->player_position_y * obj->height_bloks_y + (obj->player_direction_y * (obj->speed * 2)), 0x00ff00);
+	(obj->player_position_x * obj->width_bloks_x) + (obj->player_direction_x * (obj->speed / 2/* * 2*/)),
+	obj->player_position_y * obj->height_bloks_y + (obj->player_direction_y * (obj->speed / 2/* * 2*/)), 0x00ff00);
 	mlx_put_image_to_window(obj->mlx, obj->win, obj->window.img, 0, 0); // по y
 	mlx_destroy_image(obj->mlx, obj->window.img);
 	filling_image(&obj->window, 1920, 1080);
@@ -260,8 +272,8 @@ void	paint_map(char **map, t_value_from_map *value_map)
 	int y;
 	t_object_on_scene objects;
 
-	x = 40;
-	y = 40;
+	x = 10;
+	y = 10;
 	objects.mlx = mlx_init();
 	objects.win = mlx_new_window(objects.mlx, value_map->resolution_x, value_map->resolution_y, "Cube3D");
 	objects.map = map;
