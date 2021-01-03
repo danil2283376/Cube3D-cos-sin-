@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2020/12/29 13:31:48 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/03 15:20:55 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <math.h>
 
 typedef	struct	s_value_from_map
 {

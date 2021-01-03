@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 19:19:50 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/01 15:40:04 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/03 16:36:43 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include "../get_next_line/get_next_line.h"
 #include "../libft/libft.h"
 #include "../cube3D.h"
-#include <math.h>
 
 void            my_mlx_pixel_put(t_info_image *img, int x, int y, int color)
 {
@@ -55,13 +54,15 @@ void	raycast(t_object_on_scene *objects)
 	objects->ray_min_angle = ray.min_angle;
 	objects->ray_max_angle = ray.max_angle;
 	length_ray = 0.0;
-	int size_x = 0;
-	int size_y = 1020;
-	while (ray.min_angle < ray.max_angle/* && length_ray < 20*/)
+	int size_x = 1920;
+	int size_y = 1080;
+	int length_eye = 0;
+	int new_len_ray = 0;
+	while (ray.min_angle < ray.max_angle)
 	{
 		ray.player_position_x = save_x;
 		ray.player_position_y = save_y;
-		while (objects->map[(int)ray.player_position_y][(int)(ray.player_position_x)] != '1')
+		while (objects->map[(int)ray.player_position_y][(int)(ray.player_position_x)] != '1' && length_eye < 100000)
 		{
 			//позиция игрока		старая позиция игрока +
 			ray.player_position_x = ray.player_position_x + length_ray * cos(ray.min_angle * (M_PI / 180.0));
@@ -69,27 +70,47 @@ void	raycast(t_object_on_scene *objects)
 
 			my_mlx_pixel_put(&objects->window, ((/*objects->player.width_x*/objects->width_bloks_x * ray.player_position_x)/* + (objects->player.width_xobjects->width_bloks_x / 2)*/),
 			((/*objects->player.height_y*/objects->height_bloks_y * ray.player_position_y))/* + 35*/, 0xffff00);
-			length_ray = length_ray + 0.01;
+			length_ray = length_ray + 0.0001;
+			// printf("ray.min_angle: %f\n", ray.min_angle);
+			// printf("ray.player_angle: %f\n", ray.player_angle);
+			// if ((int)ray.min_angle == (int)ray.player_angle)
+				new_len_ray = new_len_ray + 1;
+			length_eye++;
 			// printf("Длина луча в пикселях: %f\n", length_ray);
 		}
-		// write(1, "SOS\n", 4);
-		// printf("Длина луча в пикселях: %f\n", length_ray);
-		float start = 0.0;
-		float lenght_wall = 300;
-		// printf("lenght_ray: %f\n", length_ray);
-		while (start < (lenght_wall / length_ray))
+		length_eye = 0;
+		int length_wall;
+		length_wall = 0;
+		printf("new_len_ray: %d\n", new_len_ray);
+		float top_wall = ((size_y / 2) * (1.0 - (1.0 / new_len_ray * 100)));
+		float down_wall = ((size_y / 2) * (1.0 + (1.0 / new_len_ray * 100)));
+		printf("top_wall: %f\n", top_wall);
+		printf("down_wall: %f\n", down_wall);
+		while (down_wall > top_wall)
 		{
-			// int answer = lenght_wall / length_ray;
-			// printf("answer: %d\n", answer);
-			// printf("start: %d < %f\n", start, (lenght_wall / (int)length_ray));
-			my_mlx_pixel_put(&objects->window,
-			cos(ray.min_angle * (M_PI / 180.0)) + size_x,
-			(sin(ray.min_angle * (M_PI / 180.0))) + size_y - start, 0xffff00);
-			start = start + 0.1;
+			// printf("Низ стены: %f, Вверх стены: %f\n", down_wall, top_wall);
+			my_mlx_pixel_put(&objects->window, size_x, down_wall, 0xffff00);
+			down_wall--;
 		}
-		// // bring = 0;
+		size_x = size_x - 10;
+		// write(1, "SOS\n", 4);
+		// float start = 0.0;
+		// float lenght_wall = 300;
+		// // printf("lenght_ray: %f\n", length_ray);
+		// while ((float)start < ((float)lenght_wall / (float)length_ray))
+		// {
+		// 	// int answer = lenght_wall / length_ray;
+		// 	// printf("answer: %d\n", answer);
+		// 	printf("start: %f < %f\n", start, (lenght_wall / (int)length_ray));
+		// 	my_mlx_pixel_put(&objects->window,
+		// 	cos(ray.min_angle * (M_PI / 180.0)) + size_x,
+		// 	(sin(ray.min_angle * (M_PI / 180.0))) + size_y - start, 0xffff00);
+		// 	start = start + 0.1;
+		// }
+		// // // bring = 0;
 		length_ray = 0;
-		size_x = size_x + 10;
+		new_len_ray = 0;
+		// size_x = size_x + 10;
 		ray.min_angle = ray.min_angle + 0.5;
 	}
 	// рабочий луч
@@ -213,9 +234,9 @@ int				key_hook(int keycode, t_object_on_scene *obj)
 	float move_y = (sin(obj->player_angle * (M_PI / 180.0))) * (-1);
 		// поворот градусов
 	if (keycode == 123)
-		obj->player_angle = obj->player_angle + 15.0;
+		obj->player_angle = obj->player_angle + 2.0;
 	if (keycode == 124)
-		obj->player_angle = obj->player_angle - 15.0;
+		obj->player_angle = obj->player_angle - 2.0;
 	if (/*keycode == 123 ||*/ keycode == 0/* && obj->left_ray != 0.0*/) // лево
 	{
 		obj->player_direction_x += cos((obj->ray_max_angle + 45) * (M_PI / 180.0)) / 7;
